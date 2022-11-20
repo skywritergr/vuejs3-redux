@@ -1,12 +1,13 @@
 <template>
   <CreateUser :form-model="this.formModel" @update:form-model="formUpdated" />
-  <UserTable :user-data="userData" @new:user-details-updated="updateUser" />
+  <UserTable :user-data="state.userData" @new:user-details-updated="updateUser" />
 </template>
 
 <script>
-import { ref } from 'vue';
-import CreateUser from './components/CreateUser.vue'
+import CreateUser from './components/CreateUser.vue';
 import UserTable from './components/UserTable.vue';
+
+import { mapState, mapActions } from 'redux-vuex';
 
 
 export default {
@@ -16,16 +17,6 @@ export default {
     UserTable,
   },
   setup() {
-    const userJson = ref([]);
-    const loadUserJson = async () => {
-      const users = await fetch("https://gorest.co.in/public/v2/users", {
-        headers: new Headers({
-          Authorization: 'Bearer 07964d7caeedef66eccaa61289bf9fddd23a60ed95d3a61ac2417affa3699620'
-        })
-      });
-      userJson.value = await users.json();
-    };
-
     return {
       formModel: {
         name: "",
@@ -33,29 +24,15 @@ export default {
         email: "",
         status: "active",
       },
-      userData: userJson,
-      loadUserJson,
+      state: mapState({
+        userData: state => state.users.activeUsers
+      }),
+      ...mapActions('addUser'),
     };
   },
-  mounted() {
-    this.loadUserJson();
-  },
   methods: {
-    async formUpdated() {
-      const updatedRowPromise = await fetch('https://gorest.co.in/public/v2/users', {
-        method: 'POST',
-        body: JSON.stringify(this.formModel),
-        headers: new Headers({
-          Authorization: 'Bearer 07964d7caeedef66eccaa61289bf9fddd23a60ed95d3a61ac2417affa3699620',
-          Accept: "application/json",
-          "Content-Type":"application/json"
-        })
-      });
-      const newRow = await updatedRowPromise.json();
-      this.userData = [
-        newRow,
-        ...this.userData,
-      ]
+    formUpdated() {
+      this.addUser(this.formModel)
     },
     updateUser(updatedUser) {
       const newArray = [

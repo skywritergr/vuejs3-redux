@@ -17,11 +17,11 @@
 
 <script>
 import { toRef, ref } from "vue";
+import { mapActions } from 'redux-vuex'
 import CreateUser from "./CreateUser.vue";
 
 export default {
   name: "UserTableRow",
-  emits: ['new:userDetails'],
   components: {
     CreateUser,
   },
@@ -37,6 +37,7 @@ export default {
         email: user.value.email,
         status: "active",
       },
+      ...mapActions('updateUser'),
     };
   },
   props: {
@@ -53,18 +54,8 @@ export default {
     onRowClicked() {
       this.isUpdateFormVisible = !this.isUpdateFormVisible;
     },
-    async formUpdated() {
-        const updatedRowPromise = await fetch(`https://gorest.co.in/public/v2/users/${this.user.id}`, {
-        method: 'PATCH',
-        body: JSON.stringify(this.formModel),
-        headers: new Headers({
-          Authorization: 'Bearer 07964d7caeedef66eccaa61289bf9fddd23a60ed95d3a61ac2417affa3699620',
-          Accept: "application/json",
-          "Content-Type":"application/json"
-        })
-      });
-      const newRow = await updatedRowPromise.json();
-      this.$emit('new:userDetails', newRow);
+    formUpdated() {
+      this.updateUser(this.formModel);
       this.isUpdateFormVisible = !this.isUpdateFormVisible;
     }
   },

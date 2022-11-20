@@ -89,8 +89,8 @@ export default defineComponent({
     };
   },
   methods: {
-    async submit() {
-      this.$emit("update:formModel", this.formObjectModel);
+    submit() {
+      this.$emit("update:formModel");
     },
   },
 });

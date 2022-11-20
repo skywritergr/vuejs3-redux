@@ -9,7 +9,7 @@
             <th class="py-3 px-6">Gender</th>
           </thead>
           <tbody>
-            <UserTableRow v-for="(user, idx) in userData" :key="user.id" :user="user" :idx="idx" @new:user-details="userUpdated" />
+            <UserTableRow v-for="(user, idx) in userData" :key="user.id" :user="user" :idx="idx" />
           </tbody>
         </table>
     </div>
@@ -30,10 +30,5 @@ export default {
       required: true,
     },
   },
-  methods: {
-    userUpdated(data) {
-      this.$emit('new:userDetailsUpdated', data);
-    }
-  }
 };
 </script>
