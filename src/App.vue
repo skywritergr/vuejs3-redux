@@ -9,7 +9,6 @@ import UserTable from './components/UserTable.vue';
 
 import { mapState, mapActions } from 'redux-vuex';
 
-
 export default {
   name: 'App',
   components: {
