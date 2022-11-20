@@ -1,15 +1,69 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <CreateUser :form-model="this.formModel" @update:form-model="formUpdated" />
+  <UserTable :user-data="userData" @new:user-details-updated="updateUser" />
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import { ref } from 'vue';
+import CreateUser from './components/CreateUser.vue'
+import UserTable from './components/UserTable.vue';
+
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    CreateUser,
+    UserTable,
+  },
+  setup() {
+    const userJson = ref([]);
+    const loadUserJson = async () => {
+      const users = await fetch("https://gorest.co.in/public/v2/users", {
+        headers: new Headers({
+          Authorization: 'Bearer 07964d7caeedef66eccaa61289bf9fddd23a60ed95d3a61ac2417affa3699620'
+        })
+      });
+      userJson.value = await users.json();
+    };
+
+    return {
+      formModel: {
+        name: "",
+        gender: "",
+        email: "",
+        status: "active",
+      },
+      userData: userJson,
+      loadUserJson,
+    };
+  },
+  mounted() {
+    this.loadUserJson();
+  },
+  methods: {
+    async formUpdated() {
+      const updatedRowPromise = await fetch('https://gorest.co.in/public/v2/users', {
+        method: 'POST',
+        body: JSON.stringify(this.formModel),
+        headers: new Headers({
+          Authorization: 'Bearer 07964d7caeedef66eccaa61289bf9fddd23a60ed95d3a61ac2417affa3699620',
+          Accept: "application/json",
+          "Content-Type":"application/json"
+        })
+      });
+      const newRow = await updatedRowPromise.json();
+      this.userData = [
+        newRow,
+        ...this.userData,
+      ]
+    },
+    updateUser(updatedUser) {
+      const newArray = [
+        updatedUser,
+        ...this.userData.filter(user => user.id !== updatedUser.id)
+      ];
+      this.userData = newArray;
+    }
   }
 }
 </script>
