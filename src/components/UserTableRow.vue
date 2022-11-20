@@ -58,7 +58,7 @@ export default {
         method: 'PATCH',
         body: JSON.stringify(this.formModel),
         headers: new Headers({
-          Authorization: 'Bearer 07964d7caeedef66eccaa61289bf9fddd23a60ed95d3a61ac2417affa3699620',
+          Authorization: `Bearer ${process.env.VUE_APP_API_TOKEN}`,
           Accept: "application/json",
           "Content-Type":"application/json"
         })
