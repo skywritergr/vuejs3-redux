@@ -11,14 +11,19 @@
   </tr>
 
   <div v-if="isUpdateFormVisible" class="floating">
-    <CreateUser :form-model="this.formModel" @update:form-model="formUpdated" :isUpdate="true" />
+    <CreateUser
+      :form-model="this.formModel"
+      @update:form-model="formUpdated"
+      :isUpdate="true"
+    />
   </div>
 </template>
 
 <script>
 import { toRef, ref } from "vue";
-import { mapActions } from 'redux-vuex'
+import { mapActions } from "redux-vuex";
 import CreateUser from "./CreateUser.vue";
+import { updateUser } from "../store/users/userService";
 
 export default {
   name: "UserTableRow",
@@ -26,18 +31,21 @@ export default {
     CreateUser,
   },
   setup(props) {
-    const user  = toRef(props, 'user');
+    const user = toRef(props, "user");
     const isUpdateFormVisible = ref(false);
 
     return {
       isUpdateFormVisible,
       formModel: {
+        id: user.value.id,
         name: user.value.name,
         gender: user.value.gender,
         email: user.value.email,
         status: "active",
       },
-      ...mapActions('updateUser'),
+      ...mapActions({
+        updateUser: ({ dispatch }, user) => dispatch(updateUser(user)),
+      }),
     };
   },
   props: {
@@ -57,22 +65,22 @@ export default {
     formUpdated() {
       this.updateUser(this.formModel);
       this.isUpdateFormVisible = !this.isUpdateFormVisible;
-    }
+    },
   },
 };
 </script>
 
 <style scoped>
 .floating {
-   cursor: pointer;
-   display: block;
-   float: right;  
-   z-index: 3;
-   position: absolute;
-   right: 30%; 
-   top: 25%;
-   background-color: white;
-    box-shadow: 3px 5px 16px 2px rgba(0,0,0,0.35);
-    padding: 15px;
+  cursor: pointer;
+  display: block;
+  float: right;
+  z-index: 3;
+  position: absolute;
+  right: 30%;
+  top: 25%;
+  background-color: white;
+  box-shadow: 3px 5px 16px 2px rgba(0, 0, 0, 0.35);
+  padding: 15px;
 }
 </style>

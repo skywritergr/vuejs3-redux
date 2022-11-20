@@ -31,3 +31,7 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 ### API Reference
 
 [https://gorest.co.in/](https://gorest.co.in/)
+
+### Packages used
+
+[redux-vuex](https://github.com/alexander-heimbuch/redux-vuex)

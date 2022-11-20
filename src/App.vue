@@ -8,7 +8,7 @@ import CreateUser from './components/CreateUser.vue';
 import UserTable from './components/UserTable.vue';
 
 import { mapState, mapActions } from 'redux-vuex';
-
+import { getUsers, addUser } from './store/users/userService';
 
 export default {
   name: 'App',
@@ -28,7 +28,14 @@ export default {
         userData: state => state.users.activeUsers
       }),
       ...mapActions('addUser'),
+      ...mapActions({
+        getUsers: ({dispatch}) => dispatch(getUsers()),
+        addUser: ({dispatch}, user) => dispatch(addUser(user)),
+      })
     };
+  },
+  async mounted() {
+    this.getUsers();
   },
   methods: {
     formUpdated() {

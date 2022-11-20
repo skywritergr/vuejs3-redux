@@ -1,31 +1,24 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { getUsers, addUser, updateUser } from "./userService";
 
 export const usersSlice = createSlice({
   name: "users",
   initialState: {
-    activeUsers: [
-      {
-        id: "1",
-        name: "George Smith",
-        gender: "male",
-        email: "gsmith@george.net",
-      },
-    ],
+    activeUsers: [],
   },
-  reducers: {
-    addUser: (state, action) => {
-      state.activeUsers.push(action.payload);
+  extraReducers: {
+    [getUsers.fulfilled]: (state, action) => {
+      state.activeUsers.push(...action.payload);
     },
-    updateUser: (state, action) => {
+    [addUser.fulfilled]: (state, action) => {
+      state.activeUsers = [action.payload, ...state.activeUsers];
+    },
+    [updateUser.fulfilled]: (state, action) => {
       const newArray = [
         action.payload,
-        ...state.activeUsers.filter((user) => user.id === action.payload.id),
+        ...state.activeUsers.filter((user) => user.id !== action.payload.id),
       ];
       state.activeUsers = newArray;
     },
   },
 });
-
-export const { addUser } = usersSlice.actions;
-
-export const actions = usersSlice.actions;
