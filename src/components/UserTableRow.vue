@@ -18,6 +18,7 @@
 <script>
 import { toRef, ref } from "vue";
 import CreateUser from "./CreateUser.vue";
+import { useUserStore } from '../store/users/users';
 
 export default {
   name: "UserTableRow",
@@ -28,10 +29,13 @@ export default {
   setup(props) {
     const user  = toRef(props, 'user');
     const isUpdateFormVisible = ref(false);
+    const store = useUserStore();
 
     return {
       isUpdateFormVisible,
+      store,
       formModel: {
+        id: user.value.id,
         name: user.value.name,
         gender: user.value.gender,
         email: user.value.email,
@@ -54,17 +58,7 @@ export default {
       this.isUpdateFormVisible = !this.isUpdateFormVisible;
     },
     async formUpdated() {
-        const updatedRowPromise = await fetch(`https://gorest.co.in/public/v2/users/${this.user.id}`, {
-        method: 'PATCH',
-        body: JSON.stringify(this.formModel),
-        headers: new Headers({
-          Authorization: `Bearer ${process.env.VUE_APP_API_TOKEN}`,
-          Accept: "application/json",
-          "Content-Type":"application/json"
-        })
-      });
-      const newRow = await updatedRowPromise.json();
-      this.$emit('new:userDetails', newRow);
+      this.store.updateUser(this.formModel);
       this.isUpdateFormVisible = !this.isUpdateFormVisible;
     }
   },

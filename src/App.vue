@@ -4,9 +4,11 @@
 </template>
 
 <script>
+import { computed } from '@vue/reactivity';
 import { ref } from 'vue';
 import CreateUser from './components/CreateUser.vue'
 import UserTable from './components/UserTable.vue';
+import { useUserStore } from './store/users/users';
 
 
 export default {
@@ -17,14 +19,8 @@ export default {
   },
   setup() {
     const userJson = ref([]);
-    const loadUserJson = async () => {
-      const users = await fetch("https://gorest.co.in/public/v2/users", {
-        headers: new Headers({
-          Authorization: `Bearer ${process.env.VUE_APP_API_TOKEN}`
-        })
-      });
-      userJson.value = await users.json();
-    };
+    const store = useUserStore();
+    userJson.value = store.getUsers;
 
     return {
       formModel: {
@@ -33,29 +29,16 @@ export default {
         email: "",
         status: "active",
       },
-      userData: userJson,
-      loadUserJson,
+      userData: computed(() => store.getUsers),
+      store,
     };
   },
   mounted() {
-    this.loadUserJson();
+    this.store.fetchUsers();
   },
   methods: {
     async formUpdated() {
-      const updatedRowPromise = await fetch('https://gorest.co.in/public/v2/users', {
-        method: 'POST',
-        body: JSON.stringify(this.formModel),
-        headers: new Headers({
-          Authorization: `Bearer ${process.env.VUE_APP_API_TOKEN}`,
-          Accept: "application/json",
-          "Content-Type":"application/json"
-        })
-      });
-      const newRow = await updatedRowPromise.json();
-      this.userData = [
-        newRow,
-        ...this.userData,
-      ]
+      this.store.addUser(this.formModel);
     },
     updateUser(updatedUser) {
       const newArray = [
