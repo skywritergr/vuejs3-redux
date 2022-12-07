@@ -1,4 +1,9 @@
 import { defineStore } from "pinia";
+import {
+  getAddUserPromise,
+  getUsersPromise,
+  getUpdatedRowPromise,
+} from "./userService";
 
 export const useUserStore = defineStore("users", {
   state: () => ({
@@ -11,42 +16,16 @@ export const useUserStore = defineStore("users", {
   },
   actions: {
     async fetchUsers() {
-      const usersPromise = await fetch("https://gorest.co.in/public/v2/users", {
-        headers: new Headers({
-          Authorization: `Bearer ${process.env.VUE_APP_API_TOKEN}`,
-        }),
-      });
+      const usersPromise = await getUsersPromise();
       this.users = await usersPromise.json();
     },
     async addUser(user) {
-      const updatedRowPromise = await fetch(
-        "https://gorest.co.in/public/v2/users",
-        {
-          method: "POST",
-          body: JSON.stringify(user),
-          headers: new Headers({
-            Authorization: `Bearer ${process.env.VUE_APP_API_TOKEN}`,
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          }),
-        }
-      );
+      const updatedRowPromise = await getAddUserPromise(user);
       const newRow = await updatedRowPromise.json();
       this.users = [newRow, ...this.users];
     },
     async updateUser(user) {
-      const updatedRowPromise = await fetch(
-        `https://gorest.co.in/public/v2/users/${user.id}`,
-        {
-          method: "PATCH",
-          body: JSON.stringify(user),
-          headers: new Headers({
-            Authorization: `Bearer ${process.env.VUE_APP_API_TOKEN}`,
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          }),
-        }
-      );
+      const updatedRowPromise = await getUpdatedRowPromise(user);
       const newRow = await updatedRowPromise.json();
       const newArray = [
         newRow,
